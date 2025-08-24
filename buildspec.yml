@@ -4,7 +4,7 @@ env:
   variables:
     ECR_REPOSITORY_NAME: "aws_glue_streamlit_cicd_automation"
     IMAGE_NAME: "streamlit-dashboard"
-    AWS_REGION: "${AWS_DEFAULT_REGION}"
+    AWS_REGION: "${AWS_DEFAULT_REGION:-us-east-1}"
 
 phases:
   pre_build:
