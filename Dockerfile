@@ -1,6 +1,6 @@
 # Use a lightweight official Python image as the base.
 # The `slim` tag is recommended to keep the image size small.
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # Set the working directory inside the container.
 # This is where your application files will live.
