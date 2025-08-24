@@ -1,25 +1,51 @@
+# This is a sample buildspec.yml file for AWS CodeBuild
+# It defines the build, test, and deployment steps for your repository.
+
 version: 0.2
 
-phases:
-  install:
-    runtime-versions:
-      python: 3.9
-    commands:
-      - echo "Installing dependencies..."
-      - pip install boto3
+# All commands will be run from the repository root directory.
+# You can define environment variables here if needed.
+env:
+  variables:
+    # Set the name of your ECR repository here.
+    ECR_REPOSITORY_NAME: "aws_glue_streamlit_cicd_automation"
+    # This will be the name for the image and the tag will be the commit ID
+    IMAGE_NAME: "streamlit-dashboard"
 
+# Define the build phases.
+phases:
+  # The pre-build phase is used for setup, like logging into ECR.
   pre_build:
     commands:
-      - echo "Starting pre-build phase..."
+      # Get the AWS account ID and ECR repository URI.
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com"
+      - ECR_REPOSITORY_URI="$ECR_URI/$ECR_REPOSITORY_NAME"
+      # Login to ECR to allow pushing the Docker image.
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
 
+  # The build phase is where the Docker image is built.
   build:
     commands:
-      - echo "Syncing SQL scripts to S3..."
-      - aws s3 sync sql_queries/ s3://global-partners-de-project2/athena-sql-scripts/ --delete
+      # Build the Docker image using the Dockerfile and tag it.
+      # We use the CodeBuild commit ID ($CODEBUILD_RESOLVED_SOURCE_VERSION) as the image tag.
+      - docker build -t $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      # Tag the image with "latest" for easy reference.
+      - docker tag $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION $ECR_REPOSITORY_URI:latest
 
-      - echo "Updating Glue jobs..."
-      - python cicd/update_glue_jobs.py jobs.json
+  # The post_build phase is where deployment happens.
+  post_build:
+    commands:
+      # Push the tagged Docker images to ECR.
+      - docker push $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push $ECR_REPOSITORY_URI:latest
+      # Install the dependencies required for your Glue update script.
+      # You may need to add more packages here.
+      - pip install boto3
+      # Execute the Python script to update your Glue jobs.
+      - python cicd/update_glue_jobs.py
 
 artifacts:
-  files:
-    - '**/*'
+  # This section defines what files to save after the build.
+  # We don't need to save anything here since we're pushing to ECR and updating Glue.
+  files: []

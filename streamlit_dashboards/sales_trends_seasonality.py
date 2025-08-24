@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import boto3
-import io
 import plotly.express as px
 from io import StringIO
 import matplotlib.pyplot as plt
