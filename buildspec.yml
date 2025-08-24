@@ -23,6 +23,10 @@ phases:
       - ECR_REPOSITORY_URI="$ECR_URI/$ECR_REPOSITORY_NAME"
       # Login to ECR to allow pushing the Docker image.
       - $(aws ecr get-login --no-include-email --region $AWS_REGION)
+      # Log in to Docker Hub to avoid rate limits.
+      # You need to store your Docker Hub username and password as environment variables in CodeBuild.
+      - echo "Logging in to Docker Hub..."
+      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
 
   # The build phase is where the Docker image is built.
   build:
