@@ -3,7 +3,7 @@ from botocore.exceptions import ClientError
 
 glue = boto3.client("glue")
 
-with open("glue_job_configs/jobs.json") as f:
+with open("glue_jobs/glue_job_configs/jobs.json") as f:
     jobs = json.load(f)
 
 for job in jobs:
