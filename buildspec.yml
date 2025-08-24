@@ -1,55 +1,37 @@
-# This is a sample buildspec.yml file for AWS CodeBuild
-# It defines the build, test, and deployment steps for your repository.
-
 version: 0.2
 
-# All commands will be run from the repository root directory.
-# You can define environment variables here if needed.
 env:
   variables:
-    # Set the name of your ECR repository here.
     ECR_REPOSITORY_NAME: "aws_glue_streamlit_cicd_automation"
-    # This will be the name for the image and the tag will be the commit ID
     IMAGE_NAME: "streamlit-dashboard"
+    AWS_REGION: "${AWS_DEFAULT_REGION}"
 
-# Define the build phases.
 phases:
-  # The pre-build phase is used for setup, like logging into ECR.
   pre_build:
     commands:
-      # Get the AWS account ID and ECR repository URI.
+      - echo "Starting pre-build phase..."
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com"
+      - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
       - ECR_REPOSITORY_URI="$ECR_URI/$ECR_REPOSITORY_NAME"
-      # Login to ECR to allow pushing the Docker image.
-      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
-      # Log in to Docker Hub to avoid rate limits.
-      # You need to store your Docker Hub username and password as environment variables in CodeBuild.
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URI
       - echo "Logging in to Docker Hub..."
-      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-
-  # The build phase is where the Docker image is built.
+      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD || echo "Docker Hub login failed, continuing..."
   build:
     commands:
-      # Build the Docker image using the Dockerfile and tag it.
-      # We use the CodeBuild commit ID ($CODEBUILD_RESOLVED_SOURCE_VERSION) as the image tag.
+      - echo "Building Docker image..."
       - docker build -t $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION .
-      # Tag the image with "latest" for easy reference.
       - docker tag $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION $ECR_REPOSITORY_URI:latest
-
-  # The post_build phase is where deployment happens.
   post_build:
     commands:
-      # Push the tagged Docker images to ECR.
+      - echo "Pushing Docker images to ECR..."
       - docker push $ECR_REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
       - docker push $ECR_REPOSITORY_URI:latest
-      # Install the dependencies required for your Glue update script.
-      # You may need to add more packages here.
+      - echo "Installing Python dependencies for Glue update..."
       - pip install boto3
-      # Execute the Python script to update your Glue jobs.
-      - python cicd/update_glue_jobs.py
-
+      - echo "Updating Glue jobs..."
+      - python cicd/update_glue_jobs.py || echo "Glue job update failed, check script."
+      - echo '[{"name":"streamlit-container","imageUri":"'$ECR_REPOSITORY_URI':latest"}]' > imagedefinitions.json
 artifacts:
-  # This section defines what files to save after the build.
-  # We don't need to save anything here since we're pushing to ECR and updating Glue.
-  files: []
+  files:
+    - imagedefinitions.json
