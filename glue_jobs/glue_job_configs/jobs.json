@@ -1,0 +1,43 @@
+[
+    {
+      "Name": "data-ingestion-glue-job",
+      "Type": "glueetl",
+      "ScriptLocation": "s3://aws-glue-assets-860063976206-us-east-1/scripts/data-ingestion-glue-job.py",
+      "Role": "arn:aws:iam::860063976206:role/global-partners-glue",
+      "DefaultArguments": {
+        "--TempDir": "s3://aws-glue-assets-860063976206-us-east-1/temporary/", 
+        "--JOB_NAME": "data-ingestion-glue-job"
+      },
+      "MaxRetries": 0,
+      "GlueVersion": "5.0",
+      "NumberOfWorkers": 2,
+      "WorkerType": "G.1X"
+    },
+    {
+      "Name": "data-transformation-job",
+      "Type": "glueetl",
+      "ScriptLocation": "s3://aws-glue-assets-860063976206-us-east-1/scripts/data-transformation-job.py",
+      "Role": "arn:aws:iam::860063976206:role/global-partners-glue",
+      "DefaultArguments": {
+        "--TempDir": "s3://aws-glue-assets-860063976206-us-east-1/temporary/",
+        "--JOB_NAME": "data-transformation-job"
+      },
+      "MaxRetries": 0,
+      "GlueVersion": "5.0",
+      "NumberOfWorkers": 2,
+      "WorkerType": "G.1X"
+    },
+    {
+      "Name": "athena-query-runner",
+      "Type": "pythonshell",
+      "ScriptLocation": "s3://aws-glue-assets-860063976206-us-east-1/scripts/athena-query-runner.py",
+      "Role": "arn:aws:iam::860063976206:role/global-partners-glue",
+      "DefaultArguments": {
+        "--TempDir": "s3://aws-glue-assets-860063976206-us-east-1/temporary/",
+        "--JOB_NAME": "athena-query-runner"
+      },
+      "MaxRetries": 0,
+      "GlueVersion": "5.0"
+    }
+  ]
+  

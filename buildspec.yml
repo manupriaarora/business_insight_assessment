@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Installing dependencies..."
+      - pip install boto3
+
+  pre_build:
+    commands:
+      - echo "Starting pre-build phase..."
+
+  build:
+    commands:
+      - echo "Syncing SQL scripts to S3..."
+      - aws s3 sync sql_queries/ s3://global-partners-de-project2/athena-sql-scripts/ --delete
+
+      - echo "Updating Glue jobs..."
+      - python cicd/update_glue_jobs.py jobs.json
+
+artifacts:
+  files:
+    - '**/*'
