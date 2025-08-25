@@ -8,7 +8,7 @@ import plotly.express as px
 s3 = boto3.client("s3")
 
 # Page config (call only ONCE at the top)
-st.set_page_config(page_title="Pricing & Discount Efeectiveness Dashboard", layout="wide")
+st.set_page_config(page_title="Pricing & Discount Effectiveness Dashboard", layout="wide")
 
 def pricing_discount(bucket):
     st.title("Pricing & Discount Efeectiveness Dashboard")
