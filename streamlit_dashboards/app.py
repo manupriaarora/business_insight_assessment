@@ -33,21 +33,24 @@ dashboard = st.sidebar.radio("Choose Dashboard:", [
 # -----------------------------
 # Customer Segmentation Dashboard
 # -----------------------------
-if dashboard == "Customer Segmentation":
-    customer_segmentation(bucket)
+try:
+    if dashboard == "Customer Segmentation":
+        customer_segmentation(bucket)
 
-if dashboard == "Churn Risk Indicators":
-    churn_indicator(bucket)
+    if dashboard == "Churn Risk Indicators":
+        churn_indicator(bucket)
 
-if dashboard == "Sales Trends & Seasonality":
-    sales_trend_seasonality(bucket)
+    if dashboard == "Sales Trends & Seasonality":
+        sales_trend_seasonality(bucket)
 
-if dashboard == "Loyalty Program Impact":
-    loyalty_program_impact(bucket)
+    if dashboard == "Loyalty Program Impact":
+        loyalty_program_impact(bucket)
 
-if dashboard == "Location Performance":
-    location_performance(bucket)
+    if dashboard == "Location Performance":
+        location_performance(bucket)
 
-if dashboard == "Pricing & Discount Effectiveness":
-    pricing_discount(bucket)
+    if dashboard == "Pricing & Discount Effectiveness":
+        pricing_discount(bucket)
+except:
+    st.write("No data to display")
     
