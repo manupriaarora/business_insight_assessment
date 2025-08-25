@@ -11,7 +11,7 @@ s3 = boto3.client("s3")
 st.set_page_config(page_title="Pricing & Discount Effectiveness Dashboard", layout="wide")
 
 def pricing_discount(bucket):
-    st.title("Pricing & Discount Efeectiveness Dashboard")
+    st.title("Pricing & Discount Effectiveness Dashboard")
 
     # Get the latest CSV file from S3 prefix
     prefix = "athena-query-results/pricing_discount_effectiveness/"
