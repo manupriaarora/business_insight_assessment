@@ -44,6 +44,7 @@ except Exception as e:
 
 # Write to S3 as Parquet
 # e.g., s3://my-output-bucket/date_dim/
+print(f"Write to S3 as Parquet")
 try:
     for df, path in [(date_dim_df, 'date_dim'), (order_items_df, 'order_items'), (order_item_options_df, 'order_item_options')]:
         df.write.mode("overwrite").parquet(f"s3://global-partners-de-project2/landing-zone/{path}/")

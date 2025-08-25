@@ -32,6 +32,11 @@ phases:
       - echo "Updating Glue jobs..."
       - python cicd/update_glue_jobs.py || echo "Glue job update failed, check script."
       - echo '[{"name":"streamlit-container","imageUri":"'$ECR_REPOSITORY_URI':latest"}]' > imagedefinitions.json
+      # SQL Scripts CI/CD
+      - echo "Starting SQL scripts build phase..."
+      - echo "Uploading SQL scripts to S3 without versioning..."
+      # Sync the entire sql_queries directory to a single S3 path.
+      - aws s3 sync sql_queries/ s3://global-partners-de-project2/athena-sql-scripts/
 artifacts:
   files:
     - imagedefinitions.json
