@@ -7,9 +7,24 @@ env:
     AWS_REGION: "us-east-1"
 
 phases:
+  install:
+    # Specifies the runtime environment.
+    runtime-versions:
+      python: 3.9
+      docker: 18
+
   pre_build:
     commands:
       - echo "Starting pre-build phase..."
+      # AWS Glue Job CI/CD
+      - echo "Starting AWS Glue job pre-build phase..."
+      - echo "Installing dependencies for Glue job script validation and update..."
+      - pip install boto3 flake8 pytest
+
+      # Streamlit Dashboard CI/CD
+      - echo "Starting Streamlit dashboard pre-build phase..."
+      - echo "Logging in to Amazon ECR..."
+
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
       - ECR_REPOSITORY_URI="$ECR_URI/$ECR_REPOSITORY_NAME"
@@ -37,6 +52,15 @@ phases:
       - echo "Uploading SQL scripts to S3 without versioning..."
       # Sync the entire sql_queries directory to a single S3 path.
       - aws s3 sync sql_queries/ s3://global-partners-de-project2/athena-sql-scripts/
+
+      # Updating Glue Job Scripts CI/CD
+      - echo "Starting AWS Glue Jobs scripts build phase..."
+      - echo "Uploading data ingestion script to S3 without versioning..."
+      - aws s3 sync glue_jobs/data_ingestion/ s3://aws-glue-assets-860063976206-us-east-1/scripts/
+      - echo "Uploading data transformation script to S3 without versioning..."
+      - aws s3 sync glue_jobs/data_transformation/ s3://aws-glue-assets-860063976206-us-east-1/scripts/
+      - echo "Uploading athena queries runner script to S3 without versioning..."
+      - aws s3 sync glue_jobs/athena_queries_runner/ s3://aws-glue-assets-860063976206-us-east-1/scripts/
 artifacts:
   files:
     - imagedefinitions.json
