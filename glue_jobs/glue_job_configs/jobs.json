@@ -30,8 +30,12 @@
     {
       "Name": "athena-query-runner",
       "Type": "pythonshell",
-      "ScriptLocation": "s3://aws-glue-assets-860063976206-us-east-1/scripts/athena-query-runner.py",
       "Role": "arn:aws:iam::860063976206:role/global-partners-glue",
+      "Command": {
+        "Name": "glue-python-shell",
+        "ScriptLocation": "s3://aws-glue-assets-860063976206-us-east-1/scripts/athena-query-runner.py",
+        "PythonVersion": "3.9"
+      },
       "DefaultArguments": {
         "--TempDir": "s3://aws-glue-assets-860063976206-us-east-1/temporary/",
         "--JOB_NAME": "athena-query-runner"
