@@ -7,24 +7,9 @@ env:
     AWS_REGION: "us-east-1"
 
 phases:
-  install:
-    # Specifies the runtime environment.
-    runtime-versions:
-      python: 3.9
-      docker: 18
-
   pre_build:
     commands:
       - echo "Starting pre-build phase..."
-      # AWS Glue Job CI/CD
-      - echo "Starting AWS Glue job pre-build phase..."
-      - echo "Installing dependencies for Glue job script validation and update..."
-      - pip install boto3 flake8 pytest
-
-      # Streamlit Dashboard CI/CD
-      - echo "Starting Streamlit dashboard pre-build phase..."
-      - echo "Logging in to Amazon ECR..."
-
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
       - ECR_REPOSITORY_URI="$ECR_URI/$ECR_REPOSITORY_NAME"
