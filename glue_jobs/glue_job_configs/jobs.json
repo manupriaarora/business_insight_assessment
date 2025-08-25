@@ -37,7 +37,7 @@
         "--JOB_NAME": "athena-query-runner"
       },
       "MaxRetries": 0,
-      "GlueVersion": "5.0"
+      "GlueVersion": "2.0"
     }
   ]
   
